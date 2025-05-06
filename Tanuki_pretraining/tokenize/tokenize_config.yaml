@@ -1,0 +1,10 @@
+#tokenize
+input:  
+ - ./tokenize/input_jsonl/hanrei_1
+ - ./tokenize/input_jsonl/hanrei_2
+ 
+ #tokenize
+input_tokenizer_file: ./tokenize/tokernizer/tokenizer_scale200.model
+output_prefix:  ./tokenize/tokenized_data/
+seq_length: 2048
+max_workers: 2
