@@ -1,0 +1,33 @@
+data:
+  name: team-hatakeyama-phase2/sft_baseline_100k
+  
+model:
+  name: llm-jp/llm-jp-13b-v1.0
+
+exp_params:
+  num_train_epochs: 1
+  per_device_train_batch_size: 4
+  per_device_eval_batch_size: 4
+  gradient_accumulation_steps: 8
+  save_strategy: steps
+  save_steps: 1000
+  logging_steps: 1
+  learning_rate: 5e-5
+  warmup_ratio: 0.1
+  lr_scheduler_type: cosine
+  dtype: bf16
+  use_fast: true
+  instruction_template: \n\n### 指示:\n
+  response_template: \n\n### 応答:\n
+  gradient_checkpointing: true
+  max_seq_length: 2048
+  use_peft: false
+  peft_target_model: llama-all
+  use_flash_attention_2: true
+  peft_lora_r: 128
+  peft_lora_alpha: 256
+  peft_lora_dropout: 0.05
+  neftune_noise_alpha: null
+
+  eval_strategy: steps
+  eval_steps: 50

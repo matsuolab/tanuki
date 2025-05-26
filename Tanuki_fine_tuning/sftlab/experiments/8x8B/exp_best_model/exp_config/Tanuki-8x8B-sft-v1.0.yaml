@@ -1,0 +1,86 @@
+template:
+  system: 以下は、タスクを説明する指示です。要求を適切に満たす応答を書きなさい。
+  instruction: \n\n### 指示:\n
+  input: \n\n### 入力:\n
+  output: \n\n### 応答:\n
+
+data:
+  - name: kanhatakeyama/ramdom-to-fixed-multiturn-Calm3
+    preprocess:
+      - name: preprocess_openai_messages
+        args:
+          messages: messages
+          role: role
+          content: content
+          add_eos: true
+      - name: add_bos
+    split:
+      train: 20240806filtered[1000:]
+      eval: 20240806filtered[:1000]
+  - name: team-hatakeyama-phase2/Synthetic-Calm3-MT-Coding-137k
+    preprocess:
+      - name: preprocess_openai_messages
+        args:
+          messages: messages
+          role: role
+          content: content
+          add_eos: true
+      - name: add_bos
+    split:
+      train: train[1000:26000]
+      eval: train[:1000]
+  - name: team-hatakeyama-phase2/Synthetic-JP-EN-Coding-Dataset-687k
+    preprocess:
+      - name: preprocess_openai_messages
+        args:
+          messages: messages
+          role: role
+          content: content
+          add_eos: true
+      - name: add_bos
+    split:
+      train: train[501000:551000]
+      eval: train[500000:501000]
+  - name: kanhatakeyama/AutoMultiTurnByCalm3-22B
+    preprocess:
+      - name: apply_template
+        args:
+          instruction: q1
+          output: a1
+      - name: add_bos
+    split:
+      train: train[:55000]
+      eval: train[-2000:-1000]
+
+model:
+  name: team-hatakeyama-phase2/Tanuki-8x8B-base-v1.0
+
+tokenizer:
+  name: null
+
+exp_params:
+  num_train_epochs: 1
+  per_device_train_batch_size: 2
+  per_device_eval_batch_size: 2
+  gradient_accumulation_steps: 4
+  save_strategy: epoch
+  save_steps: 0.5
+  logging_steps: 1
+  learning_rate: 5e-7
+  warmup_ratio: 0.1
+  lr_scheduler_type: cosine
+  dtype: bf16
+  use_fast: true
+  gradient_checkpointing: true
+  max_seq_length: 4096
+  use_peft: false
+  peft_target_model: tanuki-8x8
+  use_flash_attention_2: true
+  peft_lora_r: 128
+  peft_lora_alpha: 256
+  peft_lora_dropout: 0.05
+  neftune_noise_alpha: null
+
+  do_eval: true
+  eval_strategy: steps
+  eval_steps: 40

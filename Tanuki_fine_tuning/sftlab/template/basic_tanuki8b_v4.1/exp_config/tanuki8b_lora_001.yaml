@@ -1,0 +1,82 @@
+template:
+  system: 以下は、タスクを説明する指示と、文脈のある入力の組み合わせです。要求を適切に満たす応答を書きなさい。
+  instruction: \n\n### 指示:\n
+  input: \n\n### 入力:\n
+  output: \n\n### 応答:\n
+
+data:
+  - name: team-hatakeyama-phase2/OpenBookQA-Japanese
+    preprocess:
+      - name: apply_template
+        args:
+          instruction: question_stem
+          output: response
+    split:
+      train: train[:100]
+      eval: train[:100]
+  # - name: Aratako/Synthetic-JP-10-Turns-Roleplay-Dialogues-Nemotron-4-1k
+  #   preprocess:
+  #     - name: apply_chat_template
+  #       args:
+  #         messages: messages
+  #         add_system_message: true
+  #   split:
+  #     train: train[:100]
+  #     eval: train[:100]
+  - name: Aratako/Synthetic-JP-10-Turns-Roleplay-Dialogues-Nemotron-4-1k
+    preprocess:
+      - name: preprocess_openai_messages
+        args:
+          messages: messages
+          role: role
+          content: content
+    split:
+      train: train[:100]
+      eval: train[:100]
+  - name: Aratako/Synthetic-JP-10-Turns-Roleplay-Dialogues-Nemotron-4-1k
+    preprocess:
+      - name: preprocess_openai_messages
+        args:
+          messages: messages
+          role: role
+          content: content
+          ignore_original_system_message: false
+          add_eos: true
+      - name: add_bos
+    split:
+      train: train[:100]
+      eval: train[:100]
+
+model:
+  name: /storage5/shared/Llama-3-8/cleaned_tp1-pp2-ct1-LR5E-5-MINLR0.5E-5-WD0.1-WARMUP1000-nnodes1/hf_iter_0003200
+
+tokenizer:
+  name: null
+  # name: team-hatakeyama-phase2/tanuki-tokenizer
+
+exp_params:
+  num_train_epochs: 1
+  per_device_train_batch_size: 4
+  per_device_eval_batch_size: 4
+  gradient_accumulation_steps: 64
+  save_strategy: steps
+  save_steps: 1000
+  logging_steps: 1
+  learning_rate: 1e-4
+  warmup_ratio: 0.1
+  lr_scheduler_type: cosine
+  dtype: bf16
+  use_fast: true
+  gradient_checkpointing: true
+  max_seq_length: 4096
+  use_peft: true
+  peft_target_model: llama-mini
+  use_flash_attention_2: true
+  peft_lora_r: 128
+  peft_lora_alpha: 256
+  peft_lora_dropout: 0.05
+  neftune_noise_alpha: null
+
+  do_eval: true
+  eval_strategy: steps
+  eval_steps: 50
